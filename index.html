@@ -3,25 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista de compras</title>
+    <title>Lista de Compras</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header class="header">
-        <img src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Cpath%20fill='%23b38b54'%20d='M12%2012h6l8%2028h30l6-18H22'/%3E%3Ccircle%20cx='24'%20cy='52'%20r='5'%20fill='%234b453d'/%3E%3Ccircle%20cx='48'%20cy='52'%20r='5'%20fill='%234b453d'/%3E%3Cpath%20fill='%23d8af7b'%20d='M18%2022h34l-4%2012H22z'/%3E%3C/svg%3E" alt="Carrinho de compras">
-        <h1>Lista de Compras</h1>
-    </header>
-    <div class="container">
-        <div class="add-item">
-            <input type="text" id="item-input" placeholder="Digite o item para adicionar">
-            <button id="add-button">Adicionar</button>
+
+    <div class="page-wrapper">
+
+        <header class="header">
+            <div class="header-icon" aria-hidden="true">🛒</div>
+            <div>
+                <h1>Lista de Compras</h1>
+                <p class="subtitle">Organize o que falta pegar</p>
+            </div>
+        </header>
+
+        <!-- Adicionar item -->
+        <section class="add-section" aria-label="Adicionar item">
+            <div class="add-item">
+                <input
+                    type="text"
+                    id="item-input"
+                    placeholder="Ex: Leite, Pão, Ovos…"
+                    autocomplete="off"
+                    aria-label="Nome do item"
+                    maxlength="60"
+                />
+                <button id="add-button" aria-label="Adicionar item à lista">
+                    <span class="btn-icon" aria-hidden="true">+</span>
+                    <span>Adicionar</span>
+                </button>
+            </div>
+            <p class="input-hint" id="input-hint" aria-live="polite"></p>
+        </section>
+
+        <!-- Listas lado a lado -->
+        <div class="lists-wrapper">
+
+            <!-- Lista: Preciso Pegar -->
+            <section class="list-section" aria-labelledby="preciso-titulo">
+                <div class="list-header">
+                    <h2 id="preciso-titulo">
+                        <span class="list-icon" aria-hidden="true">📋</span>
+                        Preciso Pegar
+                    </h2>
+                    <span class="badge" id="badge-preciso" aria-label="0 itens">0</span>
+                </div>
+                <ul id="lista-mercado" class="lista" aria-label="Itens a pegar">
+                    <li class="empty-state" id="empty-preciso">
+                        <span aria-hidden="true">🌿</span>
+                        <p>Nenhum item na lista ainda.<br>Adicione algo acima!</p>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- Lista: Itens Pegados -->
+            <section class="list-section list-section--done" aria-labelledby="pegados-titulo">
+                <div class="list-header">
+                    <h2 id="pegados-titulo">
+                        <span class="list-icon" aria-hidden="true">✅</span>
+                        Já Peguei
+                    </h2>
+                    <span class="badge badge--done" id="badge-pegados" aria-label="0 itens">0</span>
+                </div>
+                <ul id="lista-pegados" class="lista" aria-label="Itens já pegados">
+                    <li class="empty-state" id="empty-pegados">
+                        <span aria-hidden="true">✨</span>
+                        <p>Itens marcados como pegos<br>aparecerão aqui.</p>
+                    </li>
+                </ul>
+                <button id="limpar-btn" class="limpar-btn" aria-label="Limpar todos os itens pegados" hidden>
+                    🗑 Limpar lista
+                </button>
+            </section>
+
         </div>
-        <ul id="lista-mercado">
-            <li class="item">
-                <button class="ja-peguei-button">Já peguei</button>
-            </li>
-        </ul>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>
