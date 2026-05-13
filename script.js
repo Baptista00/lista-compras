@@ -10,6 +10,7 @@ const emptyPegados = document.getElementById('empty-pegados');
 const limparBtn = document.getElementById('limpar-btn');
 const inputHint = document.getElementById('input-hint');
 const summaryText = document.getElementById('summary-text');
+const STORAGE_KEY = 'lista-compras-itens';
 
 // ── Contadores ──
 let totalPreciso = 0;
@@ -39,6 +40,44 @@ function animateBadge(badge) {
     badge.classList.add('bump');
 }
 
+function coletarItens(seletorLista) {
+    return Array.from(seletorLista.querySelectorAll('.item-name')).map((item) => item.textContent);
+}
+
+function salvarItens() {
+    const dados = {
+        preciso: coletarItens(lista),
+        pegados: coletarItens(listaPegados),
+    };
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
+}
+
+function carregarItens() {
+    const dadosSalvos = localStorage.getItem(STORAGE_KEY);
+
+    if (!dadosSalvos) return;
+
+    try {
+        const dados = JSON.parse(dadosSalvos);
+        const itensPreciso = Array.isArray(dados.preciso) ? dados.preciso : [];
+        const itensPegados = Array.isArray(dados.pegados) ? dados.pegados : [];
+
+        itensPreciso.forEach((texto) => {
+            lista.appendChild(criarItemLista(texto, false));
+        });
+
+        itensPegados.forEach((texto) => {
+            listaPegados.appendChild(criarItemLista(texto, true));
+        });
+
+        totalPreciso = itensPreciso.length;
+        totalPegados = itensPegados.length;
+    } catch {
+        localStorage.removeItem(STORAGE_KEY);
+    }
+}
+
 // ── Adicionar item ──
 function adicionarItem() {
     const texto = valorAdd.value.trim();
@@ -56,6 +95,7 @@ function adicionarItem() {
 
     totalPreciso++;
     atualizarUI();
+    salvarItens();
 
     valorAdd.value = '';
     valorAdd.focus();
@@ -116,6 +156,7 @@ function moverParaPegados(li, texto) {
         listaPegados.appendChild(liNovo);
         totalPegados++;
         atualizarUI();
+        salvarItens();
     });
 }
 
@@ -127,6 +168,7 @@ function moverParaPreciso(li, texto) {
         lista.appendChild(liNovo);
         totalPreciso++;
         atualizarUI();
+        salvarItens();
     });
 }
 
@@ -136,6 +178,7 @@ function removerItem(li, jaPegado) {
         if (jaPegado) totalPegados--;
         else          totalPreciso--;
         atualizarUI();
+        salvarItens();
     });
 }
 
@@ -151,9 +194,17 @@ function removerComAnimacao(li, callback) {
 // ── Limpar todos os itens pegados ──
 limparBtn.addEventListener('click', () => {
     const itens = listaPegados.querySelectorAll('.item');
+    let itensRestantes = itens.length;
+
+    if (itensRestantes === 0) return;
+
     itens.forEach(li => {
         li.classList.add('removing');
-        li.addEventListener('animationend', () => li.remove(), { once: true });
+        li.addEventListener('animationend', () => {
+            li.remove();
+            itensRestantes--;
+            if (itensRestantes === 0) salvarItens();
+        }, { once: true });
     });
     totalPegados = 0;
     atualizarUI();
@@ -171,4 +222,5 @@ valorAdd.addEventListener('input', () => {
 });
 
 // ── Init ──
+carregarItens();
 atualizarUI();

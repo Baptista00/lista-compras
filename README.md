@@ -1,23 +1,37 @@
-# Lista de Compras 
+# Lista de Compras
 
-Projeto de uma lista de compras desenvolvido com HTML, CSS e JavaScript.
+Aplicacao web simples para organizar itens de mercado com uma interface leve e direta. O projeto foi construido com HTML, CSS e JavaScript puro, sem dependencias externas de framework.
 
-A aplicação permite adicionar itens à lista e marcar quais produtos já foram pegos durante a compra.
+## Visao geral
 
-##  Funcionalidades
+A pagina permite adicionar produtos, mover itens entre a lista do que ainda falta pegar e a lista do que ja foi pego, remover entradas e limpar os itens concluidos. A interface tambem exibe contadores e um resumo com o total de itens.
 
-- Adicionar itens
-- Marcar itens como “já peguei”
-- Interface simples e responsiva
+## Funcionalidades
 
-##  Objetivo do projeto
+- Adicionar itens a lista
+- Validar campo vazio antes de adicionar
+- Marcar itens como pegos
+- Devolver itens para a lista principal
+- Remover itens individualmente
+- Limpar todos os itens da lista de concluidos
+- Exibir contadores por coluna
+- Exibir resumo com a quantidade total de itens
+- Mostrar estados vazios quando nao houver itens
 
-Este projeto foi desenvolvido para praticar:
-- Manipulação do DOM
-- Eventos no JavaScript
-- Estruturas condicionais
-- Organização de código
-- Desenvolvimento web
+## Tecnologias
 
-##
-🚧 Projeto em desenvolvimento.
+- HTML5
+- CSS3
+- JavaScript
+
+
+## Objetivo do projeto
+
+Este projeto serve para praticar conceitos essenciais de desenvolvimento web:
+
+- manipulacao do DOM
+- eventos no JavaScript
+- atualizacao dinamica da interface
+- organizacao de estilos
+- estrutura semantica em HTML
+
