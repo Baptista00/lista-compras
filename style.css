@@ -152,6 +152,12 @@ h1 {
     min-height: 1em;
 }
 
+.summary-text {
+    margin-top: 10px;
+    font-size: .9rem;
+    color: var(--text-soft);
+}
+
 /* ── Lists Wrapper ── */
 .lists-wrapper {
     display: grid;

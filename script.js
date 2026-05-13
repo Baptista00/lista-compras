@@ -9,6 +9,7 @@ const emptyPreciso = document.getElementById('empty-preciso');
 const emptyPegados = document.getElementById('empty-pegados');
 const limparBtn = document.getElementById('limpar-btn');
 const inputHint = document.getElementById('input-hint');
+const summaryText = document.getElementById('summary-text');
 
 // ── Contadores ──
 let totalPreciso = 0;
@@ -16,6 +17,8 @@ let totalPegados = 0;
 
 // ── Atualizar badges e estados vazios ──
 function atualizarUI() {
+    const totalItens = totalPreciso + totalPegados;
+
     badgePreciso.textContent = totalPreciso;
     badgePreciso.setAttribute('aria-label', `${totalPreciso} ${totalPreciso === 1 ? 'item' : 'itens'}`);
     animateBadge(badgePreciso);
@@ -27,6 +30,7 @@ function atualizarUI() {
     emptyPreciso.hidden = totalPreciso > 0;
     emptyPegados.hidden = totalPegados > 0;
     limparBtn.hidden = totalPegados === 0;
+    summaryText.textContent = `Voce tem ${totalItens} ${totalItens === 1 ? 'item' : 'itens'} no total.`;
 }
 
 function animateBadge(badge) {
