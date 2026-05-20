@@ -1,6 +1,6 @@
-// ── Referências ──
 const botao = document.getElementById('add-button');
 const valorAdd = document.getElementById('item-input');
+const quantityInput = document.getElementById('quantity-input');
 const lista = document.getElementById('lista-mercado');
 const listaPegados = document.getElementById('lista-pegados');
 const badgePreciso = document.getElementById('badge-preciso');
@@ -10,38 +10,35 @@ const emptyPegados = document.getElementById('empty-pegados');
 const limparBtn = document.getElementById('limpar-btn');
 const inputHint = document.getElementById('input-hint');
 const summaryText = document.getElementById('summary-text');
+const insightPendentes = document.getElementById('insight-pendentes');
+const insightPegos = document.getElementById('insight-pegos');
+const insightTotal = document.getElementById('insight-total');
 const STORAGE_KEY = 'lista-compras-itens';
 
-// ── Contadores ──
 let totalPreciso = 0;
 let totalPegados = 0;
 
-// ── Atualizar badges e estados vazios ──
-function atualizarUI() {
-    const totalItens = totalPreciso + totalPegados;
-
-    badgePreciso.textContent = totalPreciso;
-    badgePreciso.setAttribute('aria-label', `${totalPreciso} ${totalPreciso === 1 ? 'item' : 'itens'}`);
-    animateBadge(badgePreciso);
-
-    badgePegados.textContent = totalPegados;
-    badgePegados.setAttribute('aria-label', `${totalPegados} ${totalPegados === 1 ? 'item' : 'itens'}`);
-    animateBadge(badgePegados);
-
-    emptyPreciso.hidden = totalPreciso > 0;
-    emptyPegados.hidden = totalPegados > 0;
-    limparBtn.hidden = totalPegados === 0;
-    summaryText.textContent = `Voce tem ${totalItens} ${totalItens === 1 ? 'item' : 'itens'} no total.`;
+function pluralizar(valor, singular, plural) {
+    return `${valor} ${valor === 1 ? singular : plural}`;
 }
 
-function animateBadge(badge) {
-    badge.classList.remove('bump');
-    void badge.offsetWidth; // reflow para reiniciar animação
-    badge.classList.add('bump');
+function normalizarQuantidade(valor) {
+    const numero = Number.parseInt(valor, 10);
+
+    if (Number.isNaN(numero)) return 1;
+
+    return Math.min(99, Math.max(1, numero));
 }
 
-function coletarItens(seletorLista) {
-    return Array.from(seletorLista.querySelectorAll('.item-name')).map((item) => item.textContent);
+function dadosItem(li) {
+    return {
+        texto: li.querySelector('.item-name').textContent,
+        quantidade: normalizarQuantidade(li.dataset.quantidade),
+    };
+}
+
+function coletarItens(listaAlvo) {
+    return Array.from(listaAlvo.querySelectorAll('.item')).map(dadosItem);
 }
 
 function salvarItens() {
@@ -51,6 +48,158 @@ function salvarItens() {
     };
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
+}
+
+function atualizarResumo() {
+    const totalItens = totalPreciso + totalPegados;
+    const totalUnidades = [...coletarItens(lista), ...coletarItens(listaPegados)]
+        .reduce((soma, item) => soma + item.quantidade, 0);
+
+    badgePreciso.textContent = totalPreciso;
+    badgePreciso.setAttribute('aria-label', pluralizar(totalPreciso, 'item', 'itens'));
+    animateBadge(badgePreciso);
+
+    badgePegados.textContent = totalPegados;
+    badgePegados.setAttribute('aria-label', pluralizar(totalPegados, 'item', 'itens'));
+    animateBadge(badgePegados);
+
+    insightPendentes.textContent = totalPreciso;
+    insightPegos.textContent = totalPegados;
+    insightTotal.textContent = totalUnidades;
+
+    emptyPreciso.hidden = totalPreciso > 0;
+    emptyPegados.hidden = totalPegados > 0;
+    limparBtn.hidden = totalPegados === 0;
+    summaryText.textContent = `Voce tem ${pluralizar(totalItens, 'item cadastrado', 'itens cadastrados')} e ${pluralizar(totalUnidades, 'unidade', 'unidades')} no total.`;
+}
+
+function atualizarQuantidadeVisual(li, quantidade) {
+    const quantidadeNormalizada = normalizarQuantidade(quantidade);
+    li.dataset.quantidade = quantidadeNormalizada;
+    li.querySelector('.quantity-value').textContent = quantidadeNormalizada;
+    li.querySelector('.quantity-badge').textContent = `x${quantidadeNormalizada}`;
+}
+
+function atualizarQuantidade(li, delta) {
+    const quantidadeAtual = normalizarQuantidade(li.dataset.quantidade);
+    const novaQuantidade = quantidadeAtual + delta;
+
+    if (novaQuantidade < 1 || novaQuantidade > 99) return;
+
+    atualizarQuantidadeVisual(li, novaQuantidade);
+    salvarItens();
+    atualizarResumo();
+}
+
+function animateBadge(badge) {
+    badge.classList.remove('bump');
+    void badge.offsetWidth;
+    badge.classList.add('bump');
+}
+
+function criarBotaoAcao({ classe, label, texto, onClick }) {
+    const botaoAcao = document.createElement('button');
+    botaoAcao.type = 'button';
+    botaoAcao.className = classe;
+    botaoAcao.setAttribute('aria-label', label);
+    botaoAcao.textContent = texto;
+    botaoAcao.addEventListener('click', onClick);
+    return botaoAcao;
+}
+
+function criarControleQuantidade(li, texto, quantidade) {
+    const quantidadeWrap = document.createElement('div');
+    quantidadeWrap.className = 'quantity-control';
+    quantidadeWrap.setAttribute('aria-label', `Quantidade de ${texto}`);
+
+    const menos = criarBotaoAcao({
+        classe: 'quantity-stepper',
+        label: `Diminuir quantidade de ${texto}`,
+        texto: '−',
+        onClick: () => atualizarQuantidade(li, -1),
+    });
+
+    const valor = document.createElement('span');
+    valor.className = 'quantity-value';
+    valor.textContent = quantidade;
+
+    const mais = criarBotaoAcao({
+        classe: 'quantity-stepper',
+        label: `Aumentar quantidade de ${texto}`,
+        texto: '+',
+        onClick: () => atualizarQuantidade(li, 1),
+    });
+
+    quantidadeWrap.append(menos, valor, mais);
+    return quantidadeWrap;
+}
+
+function criarItemLista(texto, quantidade, jaPegado) {
+    const li = document.createElement('li');
+    li.className = `item${jaPegado ? ' item--done' : ''}`;
+
+    const content = document.createElement('div');
+    content.className = 'item-content';
+
+    const titleRow = document.createElement('div');
+    titleRow.className = 'item-title-row';
+
+    const nome = document.createElement('span');
+    nome.className = 'item-name';
+    nome.textContent = texto;
+
+    const quantityBadge = document.createElement('span');
+    quantityBadge.className = 'quantity-badge';
+
+    titleRow.append(nome, quantityBadge);
+
+    const meta = document.createElement('div');
+    meta.className = 'item-meta';
+    meta.appendChild(criarControleQuantidade(li, texto, quantidade));
+
+    content.append(titleRow, meta);
+
+    const acoes = document.createElement('div');
+    acoes.className = 'item-actions';
+
+    if (!jaPegado) {
+        acoes.appendChild(criarBotaoAcao({
+            classe: 'btn-pegar',
+            label: `Marcar ${texto} como pego`,
+            texto: 'Peguei',
+            onClick: () => moverParaPegados(li),
+        }));
+    } else {
+        acoes.appendChild(criarBotaoAcao({
+            classe: 'btn-devolver',
+            label: `Devolver ${texto} para a lista`,
+            texto: 'Devolver',
+            onClick: () => moverParaPreciso(li),
+        }));
+    }
+
+    acoes.appendChild(criarBotaoAcao({
+        classe: 'btn-remover',
+        label: `Remover ${texto} da lista`,
+        texto: '✕',
+        onClick: () => removerItem(li, jaPegado),
+    }));
+
+    li.append(content, acoes);
+    atualizarQuantidadeVisual(li, quantidade);
+    return li;
+}
+
+function restaurarItem(item, jaPegado) {
+    if (typeof item === 'string') {
+        return criarItemLista(item, 1, jaPegado);
+    }
+
+    const texto = typeof item?.texto === 'string' ? item.texto.trim() : '';
+
+    if (!texto) return null;
+
+    return criarItemLista(texto, normalizarQuantidade(item.quantidade), jaPegado);
 }
 
 function carregarItens() {
@@ -63,126 +212,82 @@ function carregarItens() {
         const itensPreciso = Array.isArray(dados.preciso) ? dados.preciso : [];
         const itensPegados = Array.isArray(dados.pegados) ? dados.pegados : [];
 
-        itensPreciso.forEach((texto) => {
-            lista.appendChild(criarItemLista(texto, false));
+        itensPreciso.forEach((item) => {
+            const li = restaurarItem(item, false);
+            if (!li) return;
+            lista.appendChild(li);
+            totalPreciso++;
         });
 
-        itensPegados.forEach((texto) => {
-            listaPegados.appendChild(criarItemLista(texto, true));
+        itensPegados.forEach((item) => {
+            const li = restaurarItem(item, true);
+            if (!li) return;
+            listaPegados.appendChild(li);
+            totalPegados++;
         });
-
-        totalPreciso = itensPreciso.length;
-        totalPegados = itensPegados.length;
     } catch {
         localStorage.removeItem(STORAGE_KEY);
     }
 }
 
-// ── Adicionar item ──
 function adicionarItem() {
     const texto = valorAdd.value.trim();
+    const quantidade = normalizarQuantidade(quantityInput.value);
 
     if (!texto) {
-        inputHint.textContent = '⚠ Digite um item antes de adicionar.';
+        inputHint.textContent = 'Digite um item antes de adicionar.';
         valorAdd.focus();
         return;
     }
 
     inputHint.textContent = '';
 
-    const li = criarItemLista(texto, false);
-    lista.appendChild(li);
-
+    lista.appendChild(criarItemLista(texto, quantidade, false));
     totalPreciso++;
-    atualizarUI();
+    atualizarResumo();
     salvarItens();
 
     valorAdd.value = '';
+    quantityInput.value = '1';
     valorAdd.focus();
 }
 
-// ── Criar elemento <li> ──
-function criarItemLista(texto, jaPegado) {
-    const li = document.createElement('li');
-    li.classList.add('item');
-    if (jaPegado) li.classList.add('item--done');
+function moverEntreListas(li, destino, origemConcluida) {
+    const item = dadosItem(li);
 
-    // Nome
-    const span = document.createElement('span');
-    span.classList.add('item-name');
-    span.textContent = texto;
-
-    // Ações
-    const acoes = document.createElement('div');
-    acoes.classList.add('item-actions');
-
-    if (!jaPegado) {
-        // Botão: Pegar ✅
-        const btnPegar = document.createElement('button');
-        btnPegar.classList.add('btn-pegar');
-        btnPegar.setAttribute('aria-label', `Marcar "${texto}" como pego`);
-        btnPegar.innerHTML = '✅ Peguei';
-        btnPegar.onclick = () => moverParaPegados(li, texto);
-        acoes.appendChild(btnPegar);
-    } else {
-        // Botão: Devolver 🔄
-        const btnDevolver = document.createElement('button');
-        btnDevolver.classList.add('btn-devolver');
-        btnDevolver.setAttribute('aria-label', `Devolver "${texto}" para a lista`);
-        btnDevolver.innerHTML = '↩ Devolver';
-        btnDevolver.onclick = () => moverParaPreciso(li, texto);
-        acoes.appendChild(btnDevolver);
-    }
-
-    // Botão: Remover 🗑
-    const btnRemover = document.createElement('button');
-    btnRemover.classList.add('btn-remover');
-    btnRemover.setAttribute('aria-label', `Remover "${texto}" da lista`);
-    btnRemover.innerHTML = '✕';
-    btnRemover.onclick = () => removerItem(li, jaPegado);
-    acoes.appendChild(btnRemover);
-
-    li.appendChild(span);
-    li.appendChild(acoes);
-
-    return li;
-}
-
-// ── Mover para "Já Peguei" ──
-function moverParaPegados(li, texto) {
     removerComAnimacao(li, () => {
-        totalPreciso--;
-        const liNovo = criarItemLista(texto, true);
-        listaPegados.appendChild(liNovo);
-        totalPegados++;
-        atualizarUI();
+        if (origemConcluida) {
+            totalPegados--;
+            totalPreciso++;
+        } else {
+            totalPreciso--;
+            totalPegados++;
+        }
+
+        destino.appendChild(criarItemLista(item.texto, item.quantidade, !origemConcluida));
+        atualizarResumo();
         salvarItens();
     });
 }
 
-// ── Mover de volta para "Preciso Pegar" ──
-function moverParaPreciso(li, texto) {
-    removerComAnimacao(li, () => {
-        totalPegados--;
-        const liNovo = criarItemLista(texto, false);
-        lista.appendChild(liNovo);
-        totalPreciso++;
-        atualizarUI();
-        salvarItens();
-    });
+function moverParaPegados(li) {
+    moverEntreListas(li, listaPegados, false);
 }
 
-// ── Remover item ──
+function moverParaPreciso(li) {
+    moverEntreListas(li, lista, true);
+}
+
 function removerItem(li, jaPegado) {
     removerComAnimacao(li, () => {
         if (jaPegado) totalPegados--;
-        else          totalPreciso--;
-        atualizarUI();
+        else totalPreciso--;
+
+        atualizarResumo();
         salvarItens();
     });
 }
 
-// ── Animação de saída ──
 function removerComAnimacao(li, callback) {
     li.classList.add('removing');
     li.addEventListener('animationend', () => {
@@ -191,36 +296,46 @@ function removerComAnimacao(li, callback) {
     }, { once: true });
 }
 
-// ── Limpar todos os itens pegados ──
 limparBtn.addEventListener('click', () => {
     const itens = listaPegados.querySelectorAll('.item');
     let itensRestantes = itens.length;
 
     if (itensRestantes === 0) return;
 
-    itens.forEach(li => {
+    totalPegados = 0;
+    atualizarResumo();
+
+    itens.forEach((li) => {
         li.classList.add('removing');
         li.addEventListener('animationend', () => {
             li.remove();
             itensRestantes--;
-            if (itensRestantes === 0) salvarItens();
+
+            if (itensRestantes === 0) {
+                salvarItens();
+                atualizarResumo();
+            }
         }, { once: true });
     });
-    totalPegados = 0;
-    atualizarUI();
 });
 
-// ── Eventos ──
 botao.addEventListener('click', adicionarItem);
 
-valorAdd.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') adicionarItem();
+valorAdd.addEventListener('keydown', (evento) => {
+    if (evento.key === 'Enter') adicionarItem();
+});
+
+quantityInput.addEventListener('keydown', (evento) => {
+    if (evento.key === 'Enter') adicionarItem();
+});
+
+quantityInput.addEventListener('input', () => {
+    quantityInput.value = String(normalizarQuantidade(quantityInput.value));
 });
 
 valorAdd.addEventListener('input', () => {
     if (valorAdd.value.trim()) inputHint.textContent = '';
 });
 
-// ── Init ──
 carregarItens();
-atualizarUI();
+atualizarResumo();
