@@ -24,6 +24,19 @@ A pagina permite adicionar produtos, mover itens entre a lista do que ainda falt
 - CSS3
 - JavaScript
 
+## Estrutura do projeto
+
+```text
+lista-compras/
+├─ index.html
+├─ README.md
+└─ assets/
+   ├─ css/
+   │  └─ style.css
+   ├─ js/
+   │  └─ app.js
+   └─ icons/
+```
 
 ## Objetivo do projeto
 
@@ -34,4 +47,3 @@ Este projeto serve para praticar conceitos essenciais de desenvolvimento web:
 - atualizacao dinamica da interface
 - organizacao de estilos
 - estrutura semantica em HTML
-
