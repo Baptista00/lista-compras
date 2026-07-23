@@ -3,129 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista de Compras</title>
     <meta name="theme-color" content="#0f172a">
+    <meta name="description" content="Uma lista de compras organizada, rápida e salva no seu navegador.">
+    <title>Mercado — Lista de Compras</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-
-    <div class="page-wrapper">
-
+    <main class="page-wrapper">
         <header class="header">
             <div class="header-copy">
                 <span class="eyebrow">Planejamento de mercado</span>
-                <h1>Lista de Compras</h1>
-                <p class="subtitle">Controle itens e quantidades sem perder o ritmo no corredor.</p>
+                <h1>Sua compra, no ritmo certo.</h1>
+                <p class="subtitle">Organize o carrinho, encontre cada item mais rápido e acompanhe o que já foi resolvido.</p>
             </div>
-            <div class="header-orb" aria-hidden="true">
-                <span>🛒</span>
-            </div>
+            <div class="header-orb" aria-hidden="true"><span>🛒</span></div>
         </header>
 
-        <section class="add-section" aria-label="Adicionar item">
+        <section class="add-section" aria-labelledby="novo-item-titulo">
             <div class="add-section-heading">
                 <div>
                     <p class="section-kicker">Novo item</p>
-                    <h2 class="section-title">Monte a próxima compra</h2>
+                    <h2 class="section-title" id="novo-item-titulo">O que está faltando?</h2>
                 </div>
                 <div class="insights" aria-label="Resumo rápido da lista">
-                    <div class="insight-card">
-                        <span class="insight-label">Pendentes</span>
-                        <strong id="insight-pendentes">0</strong>
-                    </div>
-                    <div class="insight-card insight-card--done">
-                        <span class="insight-label">Pegos</span>
-                        <strong id="insight-pegos">0</strong>
-                    </div>
-                    <div class="insight-card insight-card--total">
-                        <span class="insight-label">Unidades</span>
-                        <strong id="insight-total">0</strong>
-                    </div>
+                    <div class="insight-card"><span class="insight-label">Pendentes</span><strong id="insight-pendentes">0</strong></div>
+                    <div class="insight-card insight-card--done"><span class="insight-label">Pegos</span><strong id="insight-pegos">0</strong></div>
+                    <div class="insight-card insight-card--total"><span class="insight-label">Unidades</span><strong id="insight-total">0</strong></div>
                 </div>
             </div>
 
-            <div class="add-item">
+            <form class="add-item" id="add-form">
                 <div class="field field--name">
                     <label for="item-input">Item</label>
-                    <input
-                        type="text"
-                        id="item-input"
-                        placeholder="Ex: Leite, Pão, Ovos..."
-                        autocomplete="off"
-                        aria-label="Nome do item"
-                        maxlength="60"
-                    />
+                    <input type="text" id="item-input" placeholder="Ex.: Leite, pão, ovos..." autocomplete="off" maxlength="60" required>
+                </div>
+                <div class="field field--category">
+                    <label for="category-input">Categoria</label>
+                    <select id="category-input" aria-label="Categoria do item">
+                        <option value="Outros">✦ Outros</option>
+                        <option value="Hortifruti">🥬 Hortifruti</option>
+                        <option value="Padaria">🥖 Padaria</option>
+                        <option value="Laticínios">🥛 Laticínios</option>
+                        <option value="Mercearia">🫙 Mercearia</option>
+                        <option value="Carnes">🥩 Carnes</option>
+                        <option value="Bebidas">🥤 Bebidas</option>
+                        <option value="Limpeza">🧼 Limpeza</option>
+                    </select>
                 </div>
                 <div class="field field--qty">
                     <label for="quantity-input">Qtd.</label>
-                    <input
-                        type="number"
-                        id="quantity-input"
-                        min="1"
-                        max="99"
-                        value="1"
-                        inputmode="numeric"
-                        aria-label="Quantidade do item"
-                    />
+                    <input type="number" id="quantity-input" min="1" max="99" value="1" inputmode="numeric">
                 </div>
-                <button id="add-button" aria-label="Adicionar item à lista">
-                    <span class="btn-icon" aria-hidden="true">+</span>
-                    <span>Adicionar</span>
-                </button>
-            </div>
+                <button id="add-button" type="submit"><span class="btn-icon" aria-hidden="true">+</span><span>Adicionar</span></button>
+            </form>
             <p class="input-hint" id="input-hint" aria-live="polite"></p>
-            <p class="summary-text" id="summary-text" aria-live="polite">Voce tem 0 itens cadastrados e 0 unidades no total.</p>
+            <p class="summary-text" id="summary-text" aria-live="polite"></p>
+        </section>
+
+        <section class="tools" aria-label="Ferramentas da lista">
+            <div class="search-field">
+                <label class="sr-only" for="search-input">Buscar item</label>
+                <span aria-hidden="true">⌕</span>
+                <input id="search-input" type="search" placeholder="Buscar na lista">
+            </div>
+            <div class="tool-selects">
+                <label class="sr-only" for="filter-input">Filtrar por categoria</label>
+                <select id="filter-input">
+                    <option value="Todas">Todas as categorias</option>
+                    <option value="Hortifruti">Hortifruti</option><option value="Padaria">Padaria</option>
+                    <option value="Laticínios">Laticínios</option><option value="Mercearia">Mercearia</option>
+                    <option value="Carnes">Carnes</option><option value="Bebidas">Bebidas</option>
+                    <option value="Limpeza">Limpeza</option><option value="Outros">Outros</option>
+                </select>
+                <label class="sr-only" for="sort-input">Ordenar itens</label>
+                <select id="sort-input">
+                    <option value="recentes">Mais recentes</option>
+                    <option value="az">Nome: A–Z</option>
+                    <option value="categoria">Categoria</option>
+                </select>
+            </div>
         </section>
 
         <div class="lists-wrapper">
-
             <section class="list-section" aria-labelledby="preciso-titulo">
-                <div class="list-header">
-                    <div>
-                        <p class="list-kicker">Em aberto</p>
-                        <h2 id="preciso-titulo">
-                        <span class="list-icon" aria-hidden="true">📋</span>
-                        Preciso Pegar
-                        </h2>
-                    </div>
-                    <span class="badge" id="badge-preciso" aria-label="0 itens">0</span>
-                </div>
-                <ul id="lista-mercado" class="lista" aria-label="Itens a pegar">
-                    <li class="empty-state" id="empty-preciso">
-                        <span aria-hidden="true">🌿</span>
-                        <p>Nenhum item por aqui ainda.<br>Adicione sua primeira compra acima.</p>
-                    </li>
-                </ul>
+                <div class="list-header"><div><p class="list-kicker">Em aberto</p><h2 id="preciso-titulo"><span class="list-icon" aria-hidden="true">📋</span>Preciso pegar</h2></div><span class="badge" id="badge-preciso">0</span></div>
+                <ul id="lista-mercado" class="lista" aria-label="Itens a pegar"></ul>
+                <div class="empty-state" id="empty-preciso"><span aria-hidden="true">🌿</span><p>Nenhum item por aqui ainda.<br>Adicione sua primeira compra acima.</p></div>
             </section>
-
             <section class="list-section list-section--done" aria-labelledby="pegados-titulo">
-                <div class="list-header">
-                    <div>
-                        <p class="list-kicker">Concluidos</p>
-                        <h2 id="pegados-titulo">
-                        <span class="list-icon" aria-hidden="true">✅</span>
-                        Já Peguei
-                        </h2>
-                    </div>
-                    <span class="badge badge--done" id="badge-pegados" aria-label="0 itens">0</span>
-                </div>
-                <ul id="lista-pegados" class="lista" aria-label="Itens já pegados">
-                    <li class="empty-state" id="empty-pegados">
-                        <span aria-hidden="true">✨</span>
-                        <p>Os itens concluidos aparecem aqui<br>com a quantidade registrada.</p>
-                    </li>
-                </ul>
-                <button id="limpar-btn" class="limpar-btn" aria-label="Limpar todos os itens pegados" hidden>
-                    🗑 Limpar concluidos
-                </button>
+                <div class="list-header"><div><p class="list-kicker">Concluídos</p><h2 id="pegados-titulo"><span class="list-icon" aria-hidden="true">✅</span>Já peguei</h2></div><span class="badge badge--done" id="badge-pegados">0</span></div>
+                <ul id="lista-pegados" class="lista" aria-label="Itens já pegados"></ul>
+                <div class="empty-state" id="empty-pegados"><span aria-hidden="true">✨</span><p>Os itens concluídos aparecem aqui<br>com a quantidade registrada.</p></div>
+                <button id="limpar-btn" class="limpar-btn" type="button" hidden>Limpar concluídos</button>
             </section>
-
         </div>
-    </div>
-
+    </main>
+    <div class="toast" id="toast" role="status" aria-live="polite"><span id="toast-message"></span><button id="undo-button" type="button" hidden>Desfazer</button></div>
     <script src="assets/js/app.js"></script>
 </body>
 </html>

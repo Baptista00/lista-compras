@@ -1,22 +1,21 @@
 # Lista de Compras
 
-Aplicacao web simples para organizar itens de mercado com uma interface leve e direta. O projeto foi construido com HTML, CSS e JavaScript puro, sem dependencias externas de framework.
+Aplicação web para organizar itens de mercado com uma interface responsiva e direta. O projeto foi construído com HTML, CSS e JavaScript puro, sem dependências de framework ou servidor.
 
 ## Visao geral
 
-A pagina permite adicionar produtos, mover itens entre a lista do que ainda falta pegar e a lista do que ja foi pego, remover entradas e limpar os itens concluidos. A interface tambem exibe contadores e um resumo com o total de itens.
+A página permite planejar a compra por categoria, acompanhar itens pendentes e concluídos e manter tudo salvo no navegador.
 
 ## Funcionalidades
 
-- Adicionar itens a lista
-- Validar campo vazio antes de adicionar
-- Marcar itens como pegos
-- Devolver itens para a lista principal
-- Remover itens individualmente
-- Limpar todos os itens da lista de concluidos
-- Exibir contadores por coluna
-- Exibir resumo com a quantidade total de itens
-- Mostrar estados vazios quando nao houver itens
+- Adicionar itens com quantidade e categoria
+- Evitar duplicatas atualizando a quantidade do item existente
+- Buscar, filtrar por categoria e ordenar por nome, categoria ou recência
+- Marcar itens como pegos, devolver, editar ou remover individualmente
+- Limpar concluídos e desfazer remoções, limpezas ou mudanças de status
+- Persistir lista e preferências no `localStorage`, incluindo a migração da versão anterior
+- Exibir contadores, total de unidades e estados vazios contextuais
+- Navegação por teclado, mensagens acessíveis e suporte a redução de movimento
 
 ## Tecnologias
 
@@ -42,8 +41,7 @@ lista-compras/
 
 Este projeto serve para praticar conceitos essenciais de desenvolvimento web:
 
-- manipulacao do DOM
-- eventos no JavaScript
-- atualizacao dinamica da interface
-- organizacao de estilos
-- estrutura semantica em HTML
+- manipulação de estado e persistência local
+- eventos e atualização dinâmica do DOM
+- componentes acessíveis criados em JavaScript
+- layout responsivo com CSS moderno
